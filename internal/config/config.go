@@ -32,29 +32,10 @@ func Read() (Config, error) {
 	return cfg, nil
 }
 
-func SetUser(username string) error {
-	fileLocation, err := getConfigFilePath()
-	if err != nil {
-		return err
-	}
-
-	jsonData, err := os.ReadFile(fileLocation)
-	if err != nil {
-		return err
-	}
-	var cfg Config
-	err = json.Unmarshal(jsonData, &cfg)
-	if err != nil {
-		return err
-	}
+func (cfg *Config) SetUser(username string) error {
 	cfg.CurrentUserName = username
 
-	err = write(cfg)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return write(*cfg)
 }
 
 func getConfigFilePath() (string, error) {
