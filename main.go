@@ -29,6 +29,9 @@ func main() {
 	gCommands.register("register", handlerRegister)
 	gCommands.register("reset", handlerRest)
 	gCommands.register("users", handlerUsers)
+	gCommands.register("agg", handlerAgg)
+	gCommands.register("addfeed", handlerAddFeed)
+	gCommands.register("feeds", handleFeeds)
 
 	db, err := sql.Open("postgres", cfg.DataBaseURL)
 	if err != nil {

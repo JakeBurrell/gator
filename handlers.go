@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/JakeBurrell/gator/internal/config"
 	"github.com/JakeBurrell/gator/internal/database"
+	"github.com/JakeBurrell/gator/internal/rss"
 	"github.com/google/uuid"
 	"time"
 )
@@ -80,5 +81,67 @@ func handlerUsers(s *state, cmd command) error {
 		}
 		fmt.Print("\n")
 	}
+	return nil
+}
+
+func handlerAgg(s *state, cmd command) error {
+	rss, err := rss.FetchFeed(
+		context.Background(),
+		"https://www.wagslane.dev/index.xml",
+	)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("%+v", rss)
+	return nil
+
+}
+
+func handlerAddFeed(s *state, cmd command) error {
+	if len(cmd.args) < 2 {
+		return fmt.Errorf("usage: %s <name> <url>\n", cmd.name)
+	}
+
+	// Get current username
+	cfg, err := config.Read()
+	if err != nil {
+		return err
+	}
+	username := cfg.CurrentUserName
+
+	// Get user id
+	usr, err := s.db.GetUser(context.Background(), username)
+	if err != nil {
+		return err
+	}
+
+	// Add Feed
+	_, err = s.db.AddFeed(
+		context.Background(),
+		database.AddFeedParams{
+			ID:        uuid.New(),
+			CreatedAt: time.Now(),
+			UpdatedAt: time.Now(),
+			Name:      cmd.args[0],
+			Url:       cmd.args[1],
+			UserID:    usr.ID,
+		},
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func handleFeeds(s *state, cmd command) error {
+	feeds, err := s.db.GetFeeds(context.Background())
+	if err != nil {
+		return err
+	}
+	for _, feed := range feeds {
+		fmt.Printf("%+v\n", feed)
+	}
+
 	return nil
 }
