@@ -32,6 +32,8 @@ func main() {
 	gCommands.register("agg", handlerAgg)
 	gCommands.register("addfeed", handlerAddFeed)
 	gCommands.register("feeds", handleFeeds)
+	gCommands.register("follow", handleFollows)
+	gCommands.register("following", handlerFollowing)
 
 	db, err := sql.Open("postgres", cfg.DataBaseURL)
 	if err != nil {
@@ -57,7 +59,7 @@ func main() {
 		},
 	)
 	if err != nil {
-		fmt.Print(err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 
